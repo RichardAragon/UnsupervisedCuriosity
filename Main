@@ -1,0 +1,111 @@
+first, let us define our enviroment, which involves creating a simulated world containing different objects and events, along with reward mechanisms. Here is an example using python and gym library:
+
+```python
+import gym
+from gym import spaces
+import numpy as np
+import random
+import math
+
+class myenv(gym.environment):
+  metadata = {'render.modes': ['human']}
+   
+  def __init__(self):
+    # initialize the game environment
+     
+    self.reset()
+
+  def reset(self):
+    # set initial state of game
+    return [initial_state]
+
+  def step(self, action):
+    # take specified action and receive new state and reward
+    old_state, new_state, reward, done = self._step(action)
+    info = {}
+    return new_state, reward, done, info
+
+  def _step(self, action):
+    # perform action and update game state
+    old_state = self.states[0] # get current state
+    new_state = self._next_state(old_state, action) # calculate next state
+    reward = self._reward(new_state, old_state) # compute reward
+    done = False            # determine if episode ended
+    self.states[0] = new_state      # update current state
+    return old_state, new_state, reward, done
+
+  def render(self, mode='human'):
+    pass
+```
+
+in this case, `myenv` is defined as a subclass of `gym.environment`. It contains initialization logic, a reset function, and a `step` function that takes user input actions.
+
+now, let's create the local curiosity modules for each region. We assume the existence of several types of modules, each having unique parameters and functionalities. Here's an illustrative example:
+
+```python
+class cnnmodule(localcuriosity):
+  """implementation of convolutional neural network"""
+  ...
+
+class rnnganmodule(localcuriosity):
+  """implementation of recurrent neural networks with gated units"""
+  ...
+
+class lstmmodule(localcuriosity):
+  """implementation of long short-term memory (lstm) cells"""
+  ...
+
+class avgpoolmodule(localcuriosity):
+  """implementation of average pooling layers"""
+  ...
+
+class maxpoolmodule(localcuriosity):
+  """implementation of max pooling layers"""
+  ...
+
+# sample instantiation of a cnn module
+cnn_module = cnnmodule([5,5], [64,64])
+
+# sample instantiation of a rnngan module
+rnngan_module = rnnganmodule([8,8], [128,128])
+
+# sample instantiation of a lstm module
+lstm_module = lstmmodule([10,10], [256,256])
+
+# sample instantiation of average pooling layer
+avgpool_layer = avgpoolmodule([7,7], [64,64])
+
+# sample instantiation of max pooling layer
+maxpool_layer = maxpoolmodule([5,5], [128,128])
+```
+
+each module receives an input tensor and returns an output score representing its level of interest/novelty about the given feature map. In this instance, we have implemented four different types of modules - cnn (convolutional neural network), rnngan (recurrent neural network with gates), lstm (long short-term memory), and pooling layers (average and maximum). You can easily add more variations depending on your requirements.
+
+the global curiosity module integrates scores obtained from all local curiosity modules for the selected fragment to generate an overall reward signal. Its structure might vary according to your use case; below is one possible implementation:
+
+```python
+class globocuriosity(globalcuriosity):
+  """integrate scores obtained from local curiosity modules"""
+  def __init__(self):
+    self.modules = [] # store list of local curiosity modules
+
+  def add_module(self, module):
+    self.modules.append(module)
+
+def integrate(self):
+    """compute integrated score from local curiosity modules"""
+    total_score = 0
+    for m in self.modules:
+        total_score += m.get_score()
+    return total_score / len(self.modules)
+Copied
+Inside the method, we iterate over the list of registered local curiosity modules using the enumerate built-in Python function, which provides both index and value pairs. Then, we call the get_score method of each module to obtain its individual score contribution, accumulate them into a running total, and finally divide by the number of registered modules at the end to normalize the final score between 0 and 1.
+You should register your preferred set of local curiosity modules to the GlobCuriosity object during initialization like so:
+glb_curiosity = GlobCuriosity()
+glb_curiosity.add_module(cnn_module)
+glb_curiosity.add_module(rnn_gan_module)
+glb_curiosity.add_module(lstm_module)
+glb_curiosity.add_module(avgpool_layer)
+glb_curiosity.add_module(maxpool_layer)
+Copied
+Finally, invoke the integrate method whenever required to obtain the normalized aggregated score representing the novelty or interestingness of the given observation for the entire system.
